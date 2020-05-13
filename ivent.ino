@@ -156,18 +156,21 @@ void loop(){
  //faseA  
           t1 = millis();                                                                 //iniciando contagem de descida                                                           
           contador=0;                                                                    // reinicia cotagem
-  while ( contador< valorC/2)                                                            // enquanto o braço não atingir metade do curso escolhido
-        { analogWrite(EnableM, valorV);                                                  // habilita motor com pwm no valor de velocidade escolhido no potV    
-          digitalWrite(M1,0);  digitalWrite(M2,1);                                       // motor gira no sentido 1                
-          atualizaDisplay();                                                             // da uma passadinha p atualizar o display 
-          digitalWrite(C1,0);  digitalWrite(C2,1);analogWrite(EnableM, 255);     }        // cooler sopra c a máxima potencia p evitar perda de fluxo                                                                             
-                                                            
- //fase B                                                                                                                      
-  while ( contador< valorC)                                                              // enquanto o braço não atingir o fim do percurso prescrito no pot C            
-        { analogWrite(EnableM, valorV2);                                                 // menor velocidade nessa fase.          
-          digitalWrite(M1,0);  digitalWrite(M2,1);                                       // motor gira  no sentido 1               
-          atualizaDisplay();     }                                                       // da uma passadinha p atualizar o display 
-          digitalWrite(M1,1);  digitalWrite(M2,1);                                       // acabado o loop paramos o motor                                                            
+ 
+ while (contador< valorC) {                                                              // enquanto o braço não atingir o fim do percurso prescrito no pot C            
+   if (contador < valorC/2) {
+     analogWrite(EnableM, valorV);                                                  // habilita motor com pwm no valor de velocidade escolhido no potV    
+     digitalWrite(M1,0);  digitalWrite(M2,1);                                       // motor gira no sentido 1                
+     atualizaDisplay();                                                             // da uma passadinha p atualizar o display 
+     digitalWrite(C1,0);  digitalWrite(C2,1);analogWrite(EnableM, 255); 
+   } else {                                                                         // passando da metade do percurso
+     analogWrite(EnableM, valorV2);                                                 // menor velocidade nessa fase.          
+     digitalWrite(M1,0);  digitalWrite(M2,1);                                       // motor giro  no sentido 1               
+     atualizaDisplay();                                                             // da uma passadinha p atualizar o display
+   }                                                          
+
+   digitalWrite(M1,1);  digitalWrite(M2,1);                                       // acabado o loop paramos o motor       
+  
 //freadinha  substituir por PID
          digitalWrite(M1,1);  digitalWrite(M2,0); delay(80);                             // estrategia provisoria de parada imediata do motor, dando um microgiro em sentido contrario                 
          digitalWrite(M1,1);  digitalWrite(M2,1); delay(40);                             // esperamos em breve implementar um PID                                                                                          
@@ -176,11 +179,13 @@ void loop(){
 //........................ MOTOR RETORNANDO A POSIÇÃO SUPERIOR - PONTO ZERO
           t3=millis();                                                                   //iniciando contagem de subida
           digitalWrite(C1,1);  digitalWrite(C2,0);analogWrite(EnableM, 255);              // cooler inverte e colabora p eliminar parte dos gases tóxicos a partir do y da traqueia
-     while (  contador> limiteUp)                                                        // enquanto a leitura da posição do braço indicar  não chegou ao ponto zero                                                                                   
-        { analogWrite(EnableM, 250);                                                     // habilita o PWM com velocidade do potenciometro V
+     
+  while (contador> limiteUp) {                                                        // enquanto a leitura da posição do braço indicar  não chegou ao ponto zero                                                                                   
+          analogWrite(EnableM, 250);                                                     // habilita o PWM com velocidade do potenciometro V
           digitalWrite(M1,1);  digitalWrite(M2,0);                                       // giro invertido
-          atualizaDisplay();  }                                                               
-          digitalWrite(M1,1); digitalWrite(M2,1);                                        // desliga motor
+          atualizaDisplay();                                                             // desliga motor
+      }                                                               
+          digitalWrite(M1,1); digitalWrite(M2,1);                                        
 //freadinha substituir por PID
           digitalWrite(M1,0); digitalWrite(M2,1);  delay(100); 
           digitalWrite(M1,1); digitalWrite(M2,1);          
@@ -211,7 +216,8 @@ void checando(){
                                                                                          
           digitalWrite(M1,0); digitalWrite(M2,1);  delay(100);                           //freadinha  substituir por PID
           digitalWrite(M1,1); digitalWrite(M2,1); 
-          delay(1000);                                }                                  // espera um tempinho p iniciar o trabalho    
+          delay(1000);                                                                   // espera um tempinho p iniciar o trabalho
+         }                                      
    
  void atualizaDisplay(){                                                                 // rotina resp. pela atualização da leitura dos 3 potenciometros no display 
                                                                                                    
