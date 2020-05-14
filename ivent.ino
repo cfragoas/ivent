@@ -137,19 +137,24 @@ void setup(){
   lcd.setBacklight(HIGH);                                     //iniciando com o display
   lcd.setCursor(5,0);  lcd.print("iVent");
   delay(2000);                                                // tempo p visualização do logo do iVent , rs
-  lcd.clear();                }
+  lcd.clear();      
+  }
 
-void interrompendo(){  contador ++;  }                        // função de interrupção
+void interrompendo() {                                        // função de interrupção
+  contador ++;                           
+  }                        
 
 void loop(){  
     if (marca==0) {                                           // se certifica que esse procedimento só acontece uma vez quando o equipamento é ligado                                                               
        marca=1;
        checando();                                            // chama a rotina que faz a checagem se o braço está na posição inicial(ponto zero)
        atualizaDisplay();                                     
-       delay(1000);}                                          // delayzinho de espera p começar
+       delay(1000);                                           // delayzinho de espera p começar
+     }                                          
                      
-       leituraAmbu= digitalRead(Ambu);                        // verifica todo o tempo se o Ambu está no lugar certo
-       if (leituraAmbu==LOW){CadeAmbu();}                     // se o Ambu não está, chama a rotina CadeAmbu()- ta invertido enquanto naõ resolvemos o HARDWARE
+       leituraAmbu = digitalRead(Ambu);                        // verifica todo o tempo se o Ambu está no lugar certo
+       if (leituraAmbu == LOW){CadeAmbu();                     // se o Ambu não está, chama a rotina CadeAmbu()- ta invertido enquanto naõ resolvemos o HARDWARE
+ }                     
        atualizaDisplay();
   
 //.........................................INSPIRAÇÃO DO PACIENTE - em 2 fases A e B        
@@ -177,6 +182,7 @@ void loop(){
          t2=millis();     //encerrando contagem de descida
        
 //........................ MOTOR RETORNANDO A POSIÇÃO SUPERIOR - PONTO ZERO
+  
           t3=millis();                                                                   //iniciando contagem de subida
           digitalWrite(C1,1);  digitalWrite(C2,0);analogWrite(EnableM, 255);              // cooler inverte e colabora p eliminar parte dos gases tóxicos a partir do y da traqueia
      
@@ -189,35 +195,48 @@ void loop(){
 //freadinha substituir por PID
           digitalWrite(M1,0); digitalWrite(M2,1);  delay(100); 
           digitalWrite(M1,1); digitalWrite(M2,1);          
-          if (contador!=limiteUp){checando();}                                           // confirma posição
+          if (contador!=limiteUp) {                                                      // confirma posição
+           checando();
+           }                                           
           t4=millis();                                                                   //encerrando contagem de subida
  // tempo de espera                                                                      //delay de espera que completa o tempo faltante p fazer valer a relação i/e
           digitalWrite(C1,0);  digitalWrite(C2,1);analogWrite(EnableM, 255);             // cooler volta a dgirar enviando ar p os pumões ajudando no ppep(manter um mínimo de ar nos pulmões p q ele não colabe.
                                                                                          // temos que descobrir os pontos de inversão do cooler p maior eficiencia  
           espera=valorF*(t2-t1) - (t4-t3) ;         
-          float xx=espera/20;                                                     
-          for (int i = 0; i <=20; i++) {delay(xx); atualizaDisplay();}                   // poderiamos ter colocado um delay com o tempo xx, mas preferimos dividi-lo arbitrariamente em 20 pedaços
-          frequencia= ((t2-t1)+(t4-t3))/1000;               }                             // a cada pedaço o procedimento da um pulinho em atualizaDisplay() q atualiza qq mudança ocorrida nos potenciometros.                                                                              
+          float xx=espera/20;               
+  
+          for (int i = 0; i <=20; i++) {                                                  // poderiamos ter colocado um delay com o tempo xx, mas preferimos dividi-lo arbitrariamente em 20 pedaços
+            delay(xx); 
+            atualizaDisplay();                                         
+           }                
+  
+          frequencia= ((t2-t1)+(t4-t3))/1000;                                            // a cada pedaço o procedimento da um pulinho em atualizaDisplay() q atualiza qq mudança ocorrida nos potenciometros.                                                                              
+
+ }                             
                                                                                         //Se não fosse feito isso, durante esse espaço de tempo as alteraçoes do usuário não seriam efetivadas e nem visualiadas                                                                       
 void CadeAmbu(){ 
-   while (leituraAmbu==HIGH)                                                             // verifica se há Ambu no lugar certo, e se não estiver pisca um "A"
-       {  lcd.clear();lcd.setCursor(0,0);lcd.print("AMBU AUSENTE");
-          delay(400);lcd.clear();delay(400);
-          leituraAmbu= digitalRead(Ambu);         } }
+   while (leituraAmbu==HIGH) {                                                            // verifica se há Ambu no lugar certo, e se não estiver pisca um "A"
+     lcd.clear();lcd.setCursor(0,0);lcd.print("AMBU AUSENTE");
+     delay(400);lcd.clear();delay(400);
+     leituraAmbu= digitalRead(Ambu); 
+   } 
+ }
 
 void checando(){
-          digitalWrite(C1,1);  digitalWrite(C2,1);analogWrite(EnableM, 0);               // cooler reversível desliga// rotina de inicio 
- while (  contador> limiteUp)                                                            // enquanto a leitura da posição do braço indicar  não chegou ao ponto zero                                                                                   
-       {  analogWrite(EnableM, 70);                                                      // habilita o PWM com velocidade do potenciometro V
-          digitalWrite(M1,1);  digitalWrite(M2,0);                                       // giro invertido
-          atualizaDisplay();                                                                  
-          lcd.clear();lcd.setCursor(0,0);lcd.print("Preparando");lcd.setCursor(0,1);lcd.print("inicialização");}
-          digitalWrite(M1,1); digitalWrite(M2,1); 
+ digitalWrite(C1,1);  digitalWrite(C2,1);analogWrite(EnableM, 0);               // cooler reversível desliga// rotina de inicio 
+ while (contador > limiteUp) {                                                            // enquanto a leitura da posição do braço indicar  não chegou ao ponto zero                                                                                   
+   analogWrite(EnableM, 70);                                                      // habilita o PWM com velocidade do potenciometro V
+   digitalWrite(M1,1);  digitalWrite(M2,0);                                       // giro invertido
+   atualizaDisplay();                                                                  
+   lcd.clear();lcd.setCursor(0,0);lcd.print("Preparando");lcd.setCursor(0,1);lcd.print("inicialização");
+   }
+          
+   digitalWrite(M1,1); digitalWrite(M2,1); 
                                                                                          
-          digitalWrite(M1,0); digitalWrite(M2,1);  delay(100);                           //freadinha  substituir por PID
-          digitalWrite(M1,1); digitalWrite(M2,1); 
-          delay(1000);                                                                   // espera um tempinho p iniciar o trabalho
-         }                                      
+   digitalWrite(M1,0); digitalWrite(M2,1);  delay(100);                           //freadinha  substituir por PID
+   digitalWrite(M1,1); digitalWrite(M2,1); 
+   delay(1000);                                                                   // espera um tempinho p iniciar o trabalho
+ }                                      
    
  void atualizaDisplay(){                                                                 // rotina resp. pela atualização da leitura dos 3 potenciometros no display 
                                                                                                    
